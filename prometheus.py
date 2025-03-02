@@ -10,21 +10,22 @@ app = Flask(__name__)
 def send_message(chat_id, text):
     url = API_URL + "sendMessage"
     payload = {"chat_id": chat_id, "text": text}
-    requests.post(url, json=payload)
+    response = requests.post(url, json=payload)
+    print(f"[LOG] Enviando mensagem para {chat_id}: {text}, Status: {response.status_code}")
 
 @app.route("/", methods=["GET"])
 def index():
     return "Webhook do Oráculo está rodando!", 200
 
-@app.route(f"/webhook", methods=["POST"])
+@app.route("/webhook", methods=["POST"])
 def webhook():
     update = request.get_json()
-    print("Recebendo atualização:", update)  # Log para depuração
+    print("[LOG] Recebendo atualização do Telegram:", update)  # Log completo
     
     if "message" in update:
         chat_id = update["message"]["chat"]["id"]
-        text = update["message"].get("text", "")
-        print(f"Mensagem recebida: {text}")  # Log da mensagem recebida
+        text = update["message"].get("text", "").strip()
+        print(f"[LOG] Mensagem recebida: {text}")
         
         if text.lower() == "/status":
             send_message(chat_id, "Seu saldo atual é $10.000")
@@ -34,6 +35,8 @@ def webhook():
             send_message(chat_id, "Ordem de venda recebida!")
         else:
             send_message(chat_id, "Comando não reconhecido. Use /status, /comprar ou /vender")
+    else:
+        print("[LOG] Nenhuma mensagem detectada no update.")
     
     return "OK", 200
 
