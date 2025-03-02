@@ -1,7 +1,8 @@
 from flask import Flask, request
 import requests
+import os
 
-TOKEN = "SEU_TOKEN_AQUI"
+TOKEN = os.getenv("TELEGRAM_TOKEN")
 API_URL = f"https://api.telegram.org/bot{TOKEN}/"
 
 app = Flask(__name__)
@@ -15,7 +16,7 @@ def send_message(chat_id, text):
 def index():
     return "Webhook do Oráculo está rodando!", 200
 
-@app.route(f"/webhook/{TOKEN}", methods=["POST"])
+@app.route(f"/webhook", methods=["POST"])
 def webhook():
     update = request.get_json()
     print("Recebendo atualização:", update)  # Log para depuração
