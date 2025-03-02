@@ -15,12 +15,15 @@ def send_message(chat_id, text):
 def index():
     return "Webhook do Oráculo está rodando!", 200
 
-@app.route(f"/{TOKEN}", methods=["POST"])
+@app.route(f"/webhook/{TOKEN}", methods=["POST"])
 def webhook():
     update = request.get_json()
+    print("Recebendo atualização:", update)  # Log para depuração
+    
     if "message" in update:
         chat_id = update["message"]["chat"]["id"]
         text = update["message"].get("text", "")
+        print(f"Mensagem recebida: {text}")  # Log da mensagem recebida
         
         if text.lower() == "/status":
             send_message(chat_id, "Seu saldo atual é $10.000")
@@ -34,4 +37,4 @@ def webhook():
     return "OK", 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
